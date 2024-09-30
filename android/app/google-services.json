@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "107302142319",
+    "project_id": "meuindicador-fdce4",
+    "storage_bucket": "meuindicador-fdce4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:107302142319:android:6602e7c2db2db3a847289a",
+        "android_client_info": {
+          "package_name": "com.meuindicador"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0yOBQ11yut-9DLNvWhK-8vIKOEhZCroY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
