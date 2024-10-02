@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ImageBackground, View, Text, StyleSheet, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
+import firestore from '@react-native-firebase/firestore'; // Importa Firestore
 
 
 function validateEmail(email) {
@@ -9,7 +10,7 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,11 +33,28 @@ const LoginScreen = () => {
     }
 
     try {
-      await auth().signInWithEmailAndPassword(email, password);
+        // Realiza o login do usuário
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userId = userCredential.user.uid;
+
+      // 🔶 Recupera o tipo de usuário do Firestore
+      const userDoc = await firestore().collection('users').doc(userId).get();
+      const userData = userDoc.data();
+
+      // Exibe uma mensagem de sucesso
       Toast.show({
         type: 'success',
-        text1: 'Login realizado com sucesso!'
+        text1: 'Login realizado com sucesso!',
       });
+
+      // 🔶 Adiciona um pequeno delay de 1 segundo (1000ms) antes de redirecionar
+      setTimeout(() => {
+        if (userData.role === 'Enfermeiro') {
+          navigation.navigate('HomeEnfermeiro'); // Redireciona para a Home do Enfermeiro
+        } else if (userData.role === 'Agente de Saúde') {
+          navigation.navigate('HomeAgenteSaude'); // Redireciona para a Home do Agente de Saúde
+        }
+      }, 2000); // Aguarda 1 segundo antes de redirecionar
     } 
 
       catch (error) {
@@ -72,7 +90,7 @@ const LoginScreen = () => {
           style={styles.backgroundImage}
           resizeMode="cover"
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
             <Text style={styles.registerText}>Registrar-se</Text>
           </TouchableOpacity>
 
