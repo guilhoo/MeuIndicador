@@ -54,7 +54,7 @@ const LoginScreen = ({navigation}) => {
         } else if (userData.role === 'Agente de Saúde') {
           navigation.navigate('HomeAgenteSaude'); // Redireciona para a Home do Agente de Saúde
         }
-      }, 2000); // Aguarda 1 segundo antes de redirecionar
+      }, 1000); // Aguarda 1 segundo antes de redirecionar
     } 
 
       catch (error) {

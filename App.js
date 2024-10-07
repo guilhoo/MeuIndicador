@@ -24,8 +24,8 @@ const App = () => {
           <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Cadastro" component={CadastroScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="HomeEnfermeiro" component={HomeEnfermeiro} />
-          <Stack.Screen name="HomeAgenteSaude" component={HomeAgenteSaude} />
+          <Stack.Screen name="HomeEnfermeiro" component={HomeEnfermeiro} options={{ headerShown: false }} />
+          <Stack.Screen name="HomeAgenteSaude" component={HomeAgenteSaude} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast /> 
