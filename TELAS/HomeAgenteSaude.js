@@ -63,7 +63,7 @@ const HomeAgenteSaude = ({ navigation }) => {
         {/* Imagem dos enfermeiros */}
         <View style={styles.iconContainer}>
           <Image 
-            source={require('../assets/logoAzul.png')}
+            source={require('../assets/icon-home-agentes.png')}
             style={styles.enfermeirosIcon}
           />
         </View>
@@ -134,7 +134,8 @@ const styles = StyleSheet.create({
     width: 350,  // Tamanho da imagem (ajuste conforme necessário)
     height: 350,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginTop: 40,
+    marginBottom: 50,
   },
   button: {
     marginTop: 10,  // Espaçamento entre a imagem e o botão
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-SemiBold',  // Fonte do texto
   },
   exitButton: {
-    marginTop: 60,
+    marginTop: 40,
     alignSelf: 'center',  // Centraliza o botão Sair
   },
   exitButtonText: {
