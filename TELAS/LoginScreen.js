@@ -4,7 +4,6 @@ import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import firestore from '@react-native-firebase/firestore'; // Importa Firestore
 
-
 function validateEmail(email) {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
@@ -139,7 +138,7 @@ const LoginScreen = ({navigation}) => {
           </View>
 
           {/* Link Esqueceu a senha? */}
-          <TouchableOpacity style={styles.forgotPasswordContainer}>
+          <TouchableOpacity style={styles.forgotPasswordContainer} onPress={() => navigation.navigate('PasswordReset')}>
             <Text style={[styles.textWhite, styles.forgotPasswordText]}>Esqueceu a senha?</Text>
           </TouchableOpacity>
 
