@@ -91,6 +91,15 @@ const CadastroScreen = ({ navigation }) => {
           text2: 'Usuário cadastrado com sucesso.',
         });
 
+        // 🔶 Salva os dados do usuário no Firestore após o registro
+        await firestore().collection('users').doc(userId).set({
+          nome: nome,
+          email: email,
+          role: selectedRole, // "Enfermeiro" ou "Agente de Saúde"
+          dataNascimento: firestore.Timestamp.fromDate(date), // Armazena como Timestamp
+          coren: coren || null, // Se o campo "Coren" não for aplicável, coloca null
+        });
+
         // Adiciona um pequeno delay antes de navegar
         setTimeout(() => {
           navigation.navigate('Login');

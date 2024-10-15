@@ -11,7 +11,9 @@ import LoginScreen from './TELAS/LoginScreen';
 import HomeEnfermeiro from './TELAS/HomeEnfermeiro';
 import HomeAgenteSaude from './TELAS/HomeAgenteSaude';
 import CadastroScreen from './TELAS/CadastroScreen'; 
-import PasswordReset from './TELAS/PasswordReset'; // Tela de envio de e-mail de redefinição de senha
+import PasswordReset from './TELAS/PasswordReset';
+import Agentes from './TELAS/Agentes'
+import ViewAgente from './TELAS/ViewAgente'
 
 if (!firebase.apps.length) {
   firebase.initializeApp();
@@ -64,6 +66,8 @@ const App = () => {
           <Stack.Screen name="HomeEnfermeiro" component={HomeEnfermeiro} options={{ headerShown: false }} />
           <Stack.Screen name="HomeAgenteSaude" component={HomeAgenteSaude} options={{ headerShown: false }} />
           <Stack.Screen name="PasswordReset" component={PasswordReset} options={{ headerShown: false }} />
+          <Stack.Screen name="Agentes" component={Agentes} options={{ headerShown: false }} />
+          <Stack.Screen name="ViewAgente" component={ViewAgente} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast /> 

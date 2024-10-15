@@ -1,166 +1,122 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { app } from '../firebaseConfig'; // Certifique-se de que o Firebase está configurado corretamente
 
-const HomeAgenteSaude = ({ navigation }) => {
+const AgentesScreen = ({ navigation }) => {
+  const [agentes, setAgentes] = useState([]);
+  const [filteredAgentes, setFilteredAgentes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [nomeUsuario, setNomeUsuario] = useState('');
-
-  // Função para buscar o nome do Firestore
-  const buscarNomeUsuario = async () => {
-    try {
-      const userId = auth().currentUser.uid; // Pega o UID do usuário logado
-      const userDoc = await firestore().collection('users').doc(userId).get();
-      const nomeCompleto = userDoc.data().nome;
-
-      // Extrai o primeiro e o segundo nome
-      const nomePartes = nomeCompleto.split(' ');
-      const primeiroNome = nomePartes[0];
-      const segundoNome = nomePartes.length > 1 ? nomePartes[1] : '';
-
-      setNomeUsuario(`${primeiroNome} ${segundoNome}`);
-    } catch (error) {
-      console.error("Erro ao buscar o nome do usuário:", error);
-    }
-  };
-
-  // Carrega o nome do usuário quando a tela é montada
   useEffect(() => {
-    buscarNomeUsuario();
+    // Função para buscar os agentes de saúde no Firestore
+    const fetchAgentes = async () => {
+      try {
+        const db = getFirestore(app);
+        const q = query(collection(db, 'users'), where('role', '==', 'Agente de Saúde'));
+        const agentesSnapshot = await getDocs(q);
+        const agentesList = agentesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setAgentes(agentesList);
+        setFilteredAgentes(agentesList); // Inicialmente a lista é igual
+      } catch (error) {
+        console.error("Erro ao buscar agentes de saúde: ", error);
+      }
+    };
+
+    fetchAgentes();
   }, []);
 
-  return (
-    <ImageBackground
-      source={require('../assets/BackLogin.png')}  // Usando a mesma imagem de fundo do login
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      {/* Linha com Logo, Texto e Notificação */}
-      {/* Linha com Logo, Texto e Notificação */}
-      <View style={styles.headerContainer}>
-        {/* Logo no canto esquerdo */}
-        <Image 
-          source={require('../assets/logoAzul.png')} 
-          style={styles.logo}
-        />
-        
-        {/* Texto "Olá, Nome" */}
-        <Text style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>Olá, </Text>
-          <Text style={styles.nameText}>{nomeUsuario}</Text>
-        </Text>
+  useEffect(() => {
+    // Filtra a lista conforme o usuário digita
+    if (searchQuery === '') {
+      setFilteredAgentes(agentes); // Mostra todos quando o campo de busca está vazio
+    } else {
+      const filtered = agentes.filter(agente =>
+        agente.nome.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredAgentes(filtered);
+    }
+  }, [searchQuery, agentes]);
 
-        {/* Botão de Notificação no canto direito */}
-        <TouchableOpacity style={styles.notificationButton} onPress={() => alert('Notificação clicada!')}>
-          <Image 
-            source={require('../assets/notificacao.png')} 
-            style={styles.notificationIcon}
-          />
+  return (
+    <View style={styles.container}>
+      {/* Header com ícone de voltar e título */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Image source={require('../assets/back-icon.png')} style={styles.backIcon} />
         </TouchableOpacity>
+        <Text style={styles.title}>Agentes de Saúde</Text>
       </View>
 
-        {/* Imagem dos enfermeiros */}
-        <View style={styles.iconContainer}>
-          <Image 
-            source={require('../assets/icon-home-agentes.png')}
-            style={styles.enfermeirosIcon}
-          />
-        </View>
+      {/* Campo de busca */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar Agente de Saúde"
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+      </View>
 
-        {/* Botão Relatórios e Gráficos */}
-        <TouchableOpacity style={styles.button} onPress={() => alert('Relatórios e Gráficos')}>
-          <Text style={styles.buttonText}>Relatórios e Gráficos</Text>
-        </TouchableOpacity>
-
-        {/* Botão Relatórios e Gráficos */}
-        <TouchableOpacity style={styles.button} onPress={() => alert('Pacientes')}>
-          <Text style={styles.buttonText}>Pacientes</Text>
-        </TouchableOpacity>
-
-        {/* Botão Sair */}
-        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.exitButton}>
-          <Text style={styles.exitButtonText}>Sair</Text>
-        </TouchableOpacity>
-
-    </ImageBackground>
+      {/* Lista de Agentes */}
+      <FlatList
+        data={filteredAgentes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.itemText}>{item.nome}</Text>
+          </View>
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: 'row',  // Alinha os itens na mesma linha
-    alignItems: 'center',  // Centraliza verticalmente
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginTop: 10,
-    marginBottom: -15,
-  },
-  backgroundImage: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  logo: {
-    width: 40,  // Tamanho da logo
-    height: 40,
-    resizeMode: 'contain',
+  header: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
     marginRight: 10,
   },
-  welcomeText: {
+  backIcon: {
+    width: 24,
+    height: 24,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  item: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  itemText: {
     fontSize: 18,
-    color: '#000',
-    fontFamily: 'Montserrat-Regular',  // Fonte para o "Olá"
-  },
-  nameText: {
-    fontSize: 15,
-    color: '#000',
-    fontFamily: 'Montserrat-Bold',  // Fonte para o "Nome"
-  },
-  notificationButton: {
-    marginLeft: 'auto',  // Empurra o botão de notificação para o canto direito
-    padding: 5,  // Aumenta a área de toque do botão
-  },
-  notificationIcon: {
-    width: 30,  // Tamanho do ícone de notificação
-    height: 30,
-    resizeMode: 'contain',
-  },
-  iconContainer: {
-    marginTop: 0,  // Adiciona espaço entre o header e a imagem
-    alignItems: 'center',  // Centraliza a imagem no meio da tela
-  },
-  enfermeirosIcon: {
-    width: 350,  // Tamanho da imagem (ajuste conforme necessário)
-    height: 350,
-    resizeMode: 'contain',
-    marginTop: 40,
-    marginBottom: 50,
-  },
-  button: {
-    marginTop: 10,  // Espaçamento entre a imagem e o botão
-    backgroundColor: '#2222E7',  // Cor do botão
-    borderRadius: 20,            // Bordas arredondadas
-    width: '80%',                // Largura do botão
-    height: 40,                  // Altura do botão
-    justifyContent: 'center',    // Centraliza o texto verticalmente
-    alignItems: 'center',        // Centraliza o texto horizontalmente
-    alignSelf: 'center',         // Centraliza o botão na tela
-  },
-  buttonText: {
-    color: '#FFFFFF',            // Cor do texto do botão
-    fontSize: 16,
-    fontFamily: 'Montserrat-SemiBold',  // Fonte do texto
-  },
-  exitButton: {
-    marginTop: 40,
-    alignSelf: 'center',  // Centraliza o botão Sair
-  },
-  exitButtonText: {
-    color: '#000000',  // Cor preta para o texto
-    fontSize: 16,
-    fontFamily: 'Montserrat-SemiBold',  // Fonte com negrito
+    color: '#0000FF', // Cor azul conforme o exemplo
+    textAlign: 'left', // Para alinhar o texto à esquerda
   },
 });
 
-export default HomeAgenteSaude;
+export default AgentesScreen;

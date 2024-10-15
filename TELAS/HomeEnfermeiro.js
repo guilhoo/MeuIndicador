@@ -84,7 +84,7 @@ const HomeEnfermeiro = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Botão Relatórios e Gráficos */}
-        <TouchableOpacity style={styles.button} onPress={() => alert('Agentes de Saúde')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Agentes')}>
           <Text style={styles.buttonText}>Agentes de Saúde</Text>
         </TouchableOpacity>
 
