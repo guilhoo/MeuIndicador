@@ -14,6 +14,9 @@ import CadastroScreen from './TELAS/CadastroScreen';
 import PasswordReset from './TELAS/PasswordReset';
 import Agentes from './TELAS/Agentes'
 import ViewAgente from './TELAS/ViewAgente'
+import Microareas from './TELAS/Microareas';
+import CadastroMicroarea from './TELAS/CadastrarMicroarea';
+import EditMicroarea from './TELAS/editMicroarea';
 
 if (!firebase.apps.length) {
   firebase.initializeApp();
@@ -68,6 +71,9 @@ const App = () => {
           <Stack.Screen name="PasswordReset" component={PasswordReset} options={{ headerShown: false }} />
           <Stack.Screen name="Agentes" component={Agentes} options={{ headerShown: false }} />
           <Stack.Screen name="ViewAgente" component={ViewAgente} options={{ headerShown: false }} />
+          <Stack.Screen name="Microareas" component={Microareas} options={{ headerShown: false }} />
+          <Stack.Screen name="CadastrarMicroareas" component={CadastroMicroarea} options={{ headerShown: false }} />
+          <Stack.Screen name="editMicroareas" component={EditMicroarea} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast /> 
