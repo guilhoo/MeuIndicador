@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: '#999',
+    fontFamily: 'Montserrat-Regular',
   },
 });
 

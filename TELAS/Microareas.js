@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F0F0F0', // Fundo básico cinza claro
+        backgroundColor: '#fff', // Fundo básico cinza claro
     },
     header: {
         flexDirection: 'row',

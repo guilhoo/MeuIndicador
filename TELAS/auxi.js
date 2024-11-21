@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, ScrollView } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const HomeAgenteSaude = ({ navigation }) => {
+const HomeEnfermeiro = ({ navigation }) => {
 
   const [nomeUsuario, setNomeUsuario] = useState('');
 
@@ -31,6 +31,7 @@ const HomeAgenteSaude = ({ navigation }) => {
   }, []);
 
   return (
+   <ScrollView> 
     <ImageBackground
       source={require('../assets/BackLogin.png')}  // Usando a mesma imagem de fundo do login
       style={styles.backgroundImage}
@@ -63,7 +64,7 @@ const HomeAgenteSaude = ({ navigation }) => {
         {/* Imagem dos enfermeiros */}
         <View style={styles.iconContainer}>
           <Image 
-            source={require('../assets/icon-home-agentes.png')}
+            source={require('../assets/icon-home-enfermeiros.png')}
             style={styles.enfermeirosIcon}
           />
         </View>
@@ -74,16 +75,26 @@ const HomeAgenteSaude = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Botão Relatórios e Gráficos */}
-        <TouchableOpacity style={styles.button} onPress={() => alert('Pacientes')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Pacientes')}>
           <Text style={styles.buttonText}>Pacientes</Text>
+        </TouchableOpacity>
+
+        {/* Botão Relatórios e Gráficos */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Microareas')}>
+          <Text style={styles.buttonText}>Microáreas</Text>
+        </TouchableOpacity>
+
+        {/* Botão Relatórios e Gráficos */}
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Agentes')}>
+          <Text style={styles.buttonText}>Agentes de Saúde</Text>
         </TouchableOpacity>
 
         {/* Botão Sair */}
         <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.exitButton}>
           <Text style={styles.exitButtonText}>Sair</Text>
         </TouchableOpacity>
-
-    </ImageBackground>
+      </ImageBackground>
+    </ScrollView>
   );
 };
 
@@ -127,14 +138,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   iconContainer: {
-    marginTop: 0,  // Adiciona espaço entre o header e a imagem
     alignItems: 'center',  // Centraliza a imagem no meio da tela
   },
   enfermeirosIcon: {
-    width: 300,  // Tamanho da imagem (ajuste conforme necessário)
-    height: 300,
-    marginTop: 40,
-    marginBottom: 50,
+    width: 350,  // Tamanho da imagem (ajuste conforme necessário)
+    height: 350,
     resizeMode: 'contain',
   },
   button: {
@@ -164,4 +172,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeAgenteSaude;
+export default HomeEnfermeiro;

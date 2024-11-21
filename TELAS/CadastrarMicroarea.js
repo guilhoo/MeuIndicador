@@ -102,7 +102,7 @@ const CadastroMicroarea = () => {
       {/* Icon Cadastrar Microárea */}
       <View style={styles.iconContainerImage}>
         <Image 
-          source={require('../assets/microarea-icon.png')}
+          source={require('../assets/cadastrar_microarea.png')}
           style={styles.microareaIcon}
         />
       </View>
@@ -152,6 +152,7 @@ const CadastroMicroarea = () => {
           <Text style={styles.buttonText}>Cadastrar nova{"\n"}Microárea</Text>
         </TouchableOpacity>
       </View>
+
     </ScrollView>
   );
 };
@@ -160,6 +161,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     flexGrow: 1,
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: 'row',
@@ -232,18 +234,19 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 40,
-    alignItems: 'center',
     marginBottom: 50,
+    paddingHorizontal: 80,
   },
   button: {
     backgroundColor: '#0000AF',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderRadius: 8,
     alignContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Montserrat-Bold',
     color: '#FFFFFF',
     textAlign: 'center',

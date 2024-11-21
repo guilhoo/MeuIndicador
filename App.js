@@ -17,6 +17,19 @@ import ViewAgente from './TELAS/ViewAgente'
 import Microareas from './TELAS/Microareas';
 import CadastroMicroarea from './TELAS/CadastrarMicroarea';
 import EditMicroarea from './TELAS/editMicroarea';
+import Pacientes from './TELAS/Pacientes';
+import CadastroPacienteScreen from './TELAS/cadastrarPaciente';
+import AllPacientesList from './TELAS/AllPacientesList';
+import gravidasList from './TELAS/gravidasList'
+import criancasList from './TELAS/criancasList'
+import mulheresList from './TELAS/mulheresList'
+import hiperdiaList from './TELAS/hiperdiaList'
+import PacienteView from './TELAS/PacienteView'
+import AcompanhamentoGravida from './TELAS/AcompanhamentoGravida'
+import DadosCadastraisScreen from './TELAS/dadosCadastrais';
+import Conquista from './TELAS/ConquistaScreen'; 
+import RoadMapScreen from './TELAS/RoadMapScreen';
+import RankingScreen from './TELAS/RankingScreen';
 
 if (!firebase.apps.length) {
   firebase.initializeApp();
@@ -25,39 +38,6 @@ if (!firebase.apps.length) {
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  
-  // Função de handling para o Dynamic Link
-  const handleDynamicLink = (link) => {
-    if (link) {
-      console.log('Dynamic link capturado:', link.url); // Verifica se o link foi capturado
-      // 🔶 Removido o redirecionamento para a tela de Redefinir Senha
-    } else {
-      console.log('Nenhum dynamic link capturado');
-    }
-  };
-
-  // useEffect dentro do componente App
-  useEffect(() => {
-    // Captura link inicial (quando o app abre via link)
-    dynamicLinks().getInitialLink()
-      .then((link) => {
-        if (link) {
-          console.log('Link inicial capturado:', link.url);
-          handleDynamicLink(link);
-        } else {
-          console.log('Nenhum link inicial capturado');
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao capturar link inicial:', error);
-      });
-  
-    // Listener para links enquanto o app está aberto
-    const unsubscribe = dynamicLinks().onLink(handleDynamicLink);
-  
-    // Limpa o listener ao desmontar o componente
-    return () => unsubscribe();
-  }, []);
 
   return (
     <>
@@ -74,6 +54,19 @@ const App = () => {
           <Stack.Screen name="Microareas" component={Microareas} options={{ headerShown: false }} />
           <Stack.Screen name="CadastrarMicroareas" component={CadastroMicroarea} options={{ headerShown: false }} />
           <Stack.Screen name="editMicroareas" component={EditMicroarea} options={{ headerShown: false }} />
+          <Stack.Screen name="Pacientes" component={Pacientes} options={{ headerShown: false }} />
+          <Stack.Screen name="CadastroPacienteScreen" component={CadastroPacienteScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="AllPacientesList" component={AllPacientesList} options={{ headerShown: false }} />
+          <Stack.Screen name="gravidasList" component={gravidasList} options={{ headerShown: false }} />
+          <Stack.Screen name="criancasList" component={criancasList} options={{ headerShown: false }} />
+          <Stack.Screen name="hiperdiaList" component={hiperdiaList} options={{ headerShown: false }} />
+          <Stack.Screen name="mulheresList" component={mulheresList} options={{ headerShown: false }} />
+          <Stack.Screen name="PacienteView" component={PacienteView} options={{ headerShown: false }} />
+          <Stack.Screen name="AcompanhamentoGravida" component={AcompanhamentoGravida} options={{ headerShown: false }} />
+          <Stack.Screen name="DadosCadastrais" component={DadosCadastraisScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Conquista" component={Conquista} options={{ headerShown: false }} />
+          <Stack.Screen name="RoadMap" component={RoadMapScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Ranking" component={RankingScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast /> 

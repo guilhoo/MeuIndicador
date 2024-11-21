@@ -98,55 +98,69 @@ const EditMicroarea = () => {
   };
 
   const excluirMicroarea = async () => {
-
-    // Verifica se há apenas uma microárea na lista
-    const microareasSnapshot = await firestore().collection('microareas').get();
-    const totalMicroareas = microareasSnapshot.size;
-
-    Alert.alert(
-      "Confirmação",
-      "Tem certeza que deseja excluir esta microárea?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
-        {
-          text: "Excluir",
-          onPress: async () => {
-            try {
-              await firestore().collection('microareas').doc(microareaId).delete();
-    
-              Toast.show({
-                type: 'success',
-                text1: 'Sucesso',
-                text2: 'Microárea excluída com sucesso!',
-              });
-
-              // Se for a última microárea, volta para a tela de home
-              if (totalMicroareas === 1) {
+    try {
+      // Verifica se há pacientes associados à microárea
+      const pacientesSnapshot = await firestore()
+        .collection('pacientes')
+        .where('microarea', '==', microareaId)
+        .get();
+  
+      if (!pacientesSnapshot.empty) {
+        // Se houver pacientes associados, impede a exclusão e exibe um alerta
+        Alert.alert(
+          "Microárea Associada",
+          "Não é possível excluir esta microárea, pois há pacientes associados.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+  
+      // Se não houver pacientes associados, pergunta para confirmar a exclusão
+      Alert.alert(
+        "Confirmação",
+        "Tem certeza que deseja excluir esta microárea?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel"
+          },
+          {
+            text: "Excluir",
+            onPress: async () => {
+              try {
+                await firestore().collection('microareas').doc(microareaId).delete();
+  
+                Toast.show({
+                  type: 'success',
+                  text1: 'Sucesso',
+                  text2: 'Microárea excluída com sucesso!',
+                });
+  
+                // Volta para a tela de lista de microáreas
                 setTimeout(() => {
-                    navigation.navigate('HomeEnfermeiro'); // Volta para a tela de Home
-                }, 1000); 
-              } else {
-                // Caso contrário, volta para a lista de microáreas
-                setTimeout(() => {
-                    navigation.goBack(); // Volta para a tela anterior
-                }, 1000); 
-              } 
-            } catch (error) {
-              console.error('Erro ao excluir microárea:', error);
-              Toast.show({
-                type: 'error',
-                text1: 'Erro',
-                text2: 'Erro ao excluir microárea. Tente novamente.',
-              });
+                  navigation.goBack();
+                }, 1000);
+              } catch (error) {
+                console.error('Erro ao excluir microárea:', error);
+                Toast.show({
+                  type: 'error',
+                  text1: 'Erro',
+                  text2: 'Erro ao excluir microárea. Tente novamente.',
+                });
+              }
             }
           }
-        }
-      ],
-      { cancelable: true }
-    );
+        ],
+        { cancelable: true }
+      );
+    } catch (error) {
+      console.error('Erro ao verificar pacientes associados:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Erro ao verificar pacientes associados. Tente novamente.',
+      });
+    }
   };
 
   return (

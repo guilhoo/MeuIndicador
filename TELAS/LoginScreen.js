@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     },
     PacienteButton: {
         alignSelf: 'center',
-        marginTop: 0,
+        marginBottom: 40,
         backgroundColor: '#2222E7',
         borderRadius: 20,
         width: '50%',
