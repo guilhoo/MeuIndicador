@@ -8,6 +8,7 @@ import firestore from '@react-native-firebase/firestore'; // Importa Firestore
 
 const CadastroScreen = ({ navigation }) => {
   const [nome, setNome] = useState('');
+  const [genero, setGenero] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
@@ -19,7 +20,7 @@ const CadastroScreen = ({ navigation }) => {
   // Função de validação dos campos
   const validateForm = () => {
     // Verifica se todos os campos obrigatórios estão preenchidos
-    if (!nome || !email || !senha || !confirmarSenha || (selectedRole === 'Enfermeiro' && !coren)) {
+    if (!nome || !genero || !email || !senha || !confirmarSenha || (selectedRole === 'Enfermeiro' && !coren)) {
       Toast.show({
         type: 'error',
         text1: 'Campos em branco',
@@ -34,6 +35,15 @@ const CadastroScreen = ({ navigation }) => {
         type: 'error',
         text1: 'Coren inválido',
         text2: 'O número do Coren deve ter 8 dígitos.',
+      });
+      return false;
+    }
+
+    if (!genero) {
+      Toast.show({
+        type: 'error',
+        text1: 'Gênero não selecionado',
+        text2: 'Por favor, selecione um gênero.',
       });
       return false;
     }
@@ -94,10 +104,16 @@ const CadastroScreen = ({ navigation }) => {
         // 🔶 Salva os dados do usuário no Firestore após o registro
         await firestore().collection('users').doc(userId).set({
           nome: nome,
+          genero: genero,
           email: email,
           role: selectedRole, // "Enfermeiro" ou "Agente de Saúde"
           dataNascimento: firestore.Timestamp.fromDate(date), // Armazena como Timestamp
           coren: coren || null, // Se o campo "Coren" não for aplicável, coloca null
+          gamification: {
+            pontos: 0,        // Inicia com 0 pontos
+            nivel: 1,         // Nível inicial
+            medalhas: []      // Lista de medalhas vazia
+          }
         });
 
         // Adiciona um pequeno delay antes de navegar
@@ -108,9 +124,15 @@ const CadastroScreen = ({ navigation }) => {
         // 🔶 Salva o tipo de usuário (Enfermeiro ou Agente de Saúde) no Firestore
         await firestore().collection('users').doc(userId).set({
           nome: nome,
+          genero: genero,
           email: email,
           role: selectedRole, // "Enfermeiro" ou "Agente de Saúde"
           dataNascimento: date,
+          gamification: {
+            pontos: 0,        // Inicia com 0 pontos
+            nivel: 1,         // Nível inicial
+            medalhas: []      // Lista de medalhas vazia
+          }
         });
   
       } catch (error) {
@@ -219,6 +241,51 @@ const CadastroScreen = ({ navigation }) => {
               value={nome}  // 🔶 Vincula o valor do campo com o estado
               onChangeText={setNome}  // 🔶 Atualiza o estado conforme o usuário digita
             />
+          </View>
+
+          {/* Seleção de Gênero */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Gênero</Text>
+            <View style={styles.genderSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  genero === 'Masculino' && styles.selectedButton, // Aplica o estilo de seleção
+                ]}
+                onPress={() => {
+                  setGenero('Masculino')
+                  console.log('Gênero selecionado:', 'Masculino');
+                }}
+              >
+                <Text
+                  style={[
+                    styles.genderButtonText,
+                    genero === 'Masculino' && styles.selectedButtonText, // Altera o texto quando selecionado
+                  ]}
+                >
+                  Masculino
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  genero === 'Feminino' && styles.selectedButton,
+                ]}
+                onPress={() => {
+                  setGenero('Feminino');
+                  console.log('Gênero selecionado:', 'Feminino');
+                }}
+              >
+                <Text
+                  style={[
+                    styles.genderButtonText,
+                    genero === 'Feminino' && styles.selectedButtonText,
+                  ]}
+                >
+                  Feminino
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {selectedRole === 'Enfermeiro' && (
@@ -404,6 +471,31 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: 'Montserrat-Regular',
   },
+  genderSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  genderButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 25,
+    alignItems: 'center',
+    marginBottom: 10,
+    borderColor: '#2222E7',
+  },
+  genderButtonText: {
+    fontSize: 14,
+    color: '#333',
+    fontFamily: 'Montserrat-Regular',
+  },
+  selectedButtonText: {
+    color: '#fff', // Texto branco quando selecionado
+  },
+  
 });
 
 export default CadastroScreen;

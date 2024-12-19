@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native'; // Importa o useFocusEffect
 
 const HomeEnfermeiro = ({ navigation }) => {
 
   const [nomeUsuario, setNomeUsuario] = useState('');
+  const [nivel, setNivel] = useState(1); // Estado para o nível
+  const [pontos, setPontos] = useState(0); // Estado para os pontos
 
   // Função para buscar o nome do Firestore
   const buscarNomeUsuario = async () => {
@@ -20,18 +23,26 @@ const HomeEnfermeiro = ({ navigation }) => {
       const segundoNome = nomePartes.length > 1 ? nomePartes[1] : '';
 
       setNomeUsuario(`${primeiroNome} ${segundoNome}`);
+
+      // Atualiza os estados de nível e pontos
+      const gamification = userDoc.data().gamification || {};
+      setNivel(gamification.nivel || 1);
+      setPontos(gamification.pontos || 0);
+
     } catch (error) {
       console.error("Erro ao buscar o nome do usuário:", error);
     }
   };
 
-  // Carrega o nome do usuário quando a tela é montada
-  useEffect(() => {
-    buscarNomeUsuario();
-  }, []);
+  // Atualiza os dados ao entrar na tela Home
+  useFocusEffect(
+    React.useCallback(() => {
+      buscarNomeUsuario();
+    }, [])
+  );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
         {/* Logo no canto esquerdo */}
         <Image 
@@ -67,7 +78,7 @@ const HomeEnfermeiro = ({ navigation }) => {
         {/* Nível */}
         <View style={styles.infoItem}>
           <Image source={require('../assets/nivel-icon.png')} style={styles.nivelIcon} />
-          <Text style={styles.infoText}>3</Text>
+          <Text style={styles.infoText}>{nivel}</Text>
           <Text style={styles.infoLabel}>Nível</Text>
         </View>
 
@@ -85,7 +96,7 @@ const HomeEnfermeiro = ({ navigation }) => {
         {/* Pontos */}
         <View style={styles.infoItem}>
           <Image source={require('../assets/pontos-icon.png')} style={styles.pontosIcon} />
-          <Text style={styles.infoText}>13</Text>
+          <Text style={styles.infoText}>{pontos}</Text>
           <Text style={styles.infoLabel}>Pontos</Text>
         </View>
       </View>
@@ -118,38 +129,44 @@ const HomeEnfermeiro = ({ navigation }) => {
         <View style={styles.divider2} />
 
         {/* Opção Relatório */}
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Relatorios')}>
+        <TouchableOpacity
+            style={styles.option}
+            onPress={() => {
+              Alert.alert(
+                "Desculpe", // Título do alerta
+                "Essa opção ainda está em desenvolvimento.", // Mensagem do alerta
+                [{ text: "OK" }] // Botão do alerta
+              );
+            }}
+          >
           <Image source={require('../assets/icon-relatorio.png')} style={styles.optionIcon} />
           <Text style={styles.optionText}>Relatórios</Text>
         </TouchableOpacity>
 
         <View style={styles.bottomMenu}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.menuItem}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeEnfermeiro')} style={styles.menuItem}>
             <Image source={require('../assets/home-icon.png')} style={styles.menuIcon} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Conquista')} style={styles.menuItem}>
-            <Image source={require('../assets/conquista-icon.png')} style={styles.menuIcon} />
+            <Image source={require('../assets/conquista-icon2.png')} style={styles.bottomconquista} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('RoadMap')} style={styles.menuItem}>
-            <Image source={require('../assets/roadmap-icon.png')} style={styles.menuIcon} />
+            <Image source={require('../assets/roadmap-icon2.png')} style={styles.menuIcon} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Ranking')} style={styles.menuItem}>
-            <Image source={require('../assets/ranking-icon.png')} style={styles.menuIcon} />
+            <Image source={require('../assets/ranking-icon2.png')} style={styles.menuIcon} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.menuItem}>
-            <Image source={require('../assets/logout-icon.png')} style={styles.menuIcon} />
+            <Image source={require('../assets/logout-icon.png')} style={styles.exitIcon} />
           </TouchableOpacity>
         </View>
 
       </View>
-
-      
-
-    </ScrollView>  
+    </View>  
   );
 };  
 
@@ -306,6 +323,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 4,
   },
+  bottomconquista: {
+    width: 35,
+    height: 20,
+  },
+  exitIcon: {
+    width: 22,
+    height: 20,
+  }
 });
 
 export default HomeEnfermeiro;

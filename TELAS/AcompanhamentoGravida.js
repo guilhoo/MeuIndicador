@@ -5,6 +5,10 @@ import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import { adicionarPontos } from './gamificationRules';
+import auth from '@react-native-firebase/auth';
+
+import { verificarConquista, incrementarContador, registrarConsulta} from './conquistasRules';
 
 const GravidaAcompanhamentoScreen = () => {
   const navigation = useNavigation();
@@ -27,6 +31,12 @@ const GravidaAcompanhamentoScreen = () => {
 
   // Estado para acumular todas as alterações pendentes
   const [pendingUpdates, setPendingUpdates] = useState({});
+
+  // Estados para as Consultas
+  const [contadorConsultas, setContadorConsultas] = useState(0);
+  const [contadorConsultasOdonto, setContadorConsultasOdonto] = useState(0);
+  const [contadorConsultasApoio, setContadorConsultasApoio] = useState(0);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -108,6 +118,8 @@ const GravidaAcompanhamentoScreen = () => {
   // Função para salvar a alteração do campo específico no banco de dados
   const saveChanges = async () => {
     if (Object.keys(pendingUpdates).length > 0) {
+      console.log("Campos alterados (pendingUpdates):", pendingUpdates);
+
       try {
         // Cria um objeto para atualização no Firestore com a estrutura correta
         const updateData = Object.keys(pendingUpdates).reduce((acc, field) => {
@@ -115,7 +127,129 @@ const GravidaAcompanhamentoScreen = () => {
           return acc;
         }, {});
 
+        // Atualiza os dados do paciente no Firestore
         await firestore().collection('pacientes').doc(paciente.id).update(updateData);
+
+        // 🔶 Regras de pontuação
+        const pontosPorCampo = {
+          dum: 5,
+          idadeGInicio: 5,
+          testeRapido: 5,
+          consultaOdonto: 10, // Pontos por consulta odontológica
+          preventivo: 10,
+          causaAltoRisco: 5,
+          dataPrimeiraConsulta: 5,
+          dataSegundaConsulta: 5,
+          dataTerceiraConsulta: 5,
+          dataQuartaConsulta: 5,
+          dataQuintaConsulta: 5,
+          dataParto: 10,
+          tipoParto: 5,
+        };
+
+        // Soma os pontos para todos os campos alterados
+        const pontosGanhos = Object.keys(pendingUpdates).reduce((total, field) => {
+          const pontos = pontosPorCampo[field] || 0; // Pontos do campo
+          console.log(`Campo: ${field}, Pontos: ${pontos}`);
+          return total + pontos;
+        }, 0);
+        console.log(`Total de pontos ganhos: ${pontosGanhos}`);
+
+        // Atualiza os pontos no Firestore para o usuário ativo
+        if (pontosGanhos > 0) {
+          const userId = auth().currentUser?.uid; // Obtém o ID do usuário autenticado
+          console.log("ID do usuário ativo:", userId);
+          await adicionarPontos(userId, pontosGanhos);
+        }
+
+        // 🔶 Lógica de conquistas (Proativo no Pré-natal)
+        if (
+          pendingUpdates.dataPrimeiraConsulta ||
+          pendingUpdates.dataSegundaConsulta ||
+          pendingUpdates.dataTerceiraConsulta ||
+          pendingUpdates.dataQuartaConsulta ||
+          pendingUpdates.dataQuintaConsulta
+        ) {
+
+          const novoContador = incrementarContador(contadorConsultas); // Incrementa o contador localmente
+          setContadorConsultas(novoContador); // Atualiza o estado localmente
+
+          const resultadoConquista = await registrarConsulta(
+            novoContador,
+            setContadorConsultas,
+            "Proativo no Pré-natal"
+          );
+
+          if (resultadoConquista?.desbloqueada) {
+            console.log("Conquista desbloqueada:", "Proativo no Pré-natal");
+            console.log("Pontos ganhos com a conquista:", resultadoConquista.pontos);
+
+            const userId = auth().currentUser?.uid;
+            await adicionarPontos(userId, resultadoConquista.pontos);
+
+            Toast.show({
+              type: 'success',
+              text1: 'Parabéns!',
+              text2: `Você desbloqueou a conquista: "Proativo no Pré-natal"!`,
+            });
+          }
+        }
+
+        // 🔶 Lógica de conquistas (Cuidador Odontológico)
+        if (pendingUpdates.consultaOdonto) {
+
+          const novoContador = incrementarContador(contadorConsultas); // Incrementa o contador localmente
+          setContadorConsultas(novoContador); // Atualiza o estado localmente
+
+          const resultadoOdonto = await registrarConsulta(
+            novoContador,
+            setContadorConsultasOdonto,
+            "Cuidador Odontológico"
+          );
+
+          if (resultadoOdonto?.desbloqueada) {
+            console.log("Conquista desbloqueada:", "Cuidador Odontológico");
+            console.log("Pontos ganhos com a conquista:", resultadoOdonto.pontos);
+
+            const userId = auth().currentUser?.uid;
+            await adicionarPontos(userId, resultadoOdonto.pontos);
+
+            Toast.show({
+              type: 'success',
+              text1: 'Parabéns!',
+              text2: `Você desbloqueou a conquista: "Cuidador Odontológico"!`,
+            });
+          }
+        }
+
+        // 🔶 Lógica de conquistas (Apoio à Saúde)
+        if (pendingUpdates.testeRapido) {
+
+          const novoContador = incrementarContador(contadorConsultas); // Incrementa o contador localmente
+          setContadorConsultas(novoContador); // Atualiza o estado localmente
+
+          const resultadoApoio = await registrarConsulta(
+            novoContador,
+            setContadorConsultasApoio,
+            "Apoio à Saúde"
+          );
+
+          if (resultadoApoio?.desbloqueada) {
+            console.log("Conquista desbloqueada:", "Apoio à Saúde");
+            console.log("Pontos ganhos com a conquista:", resultadoApoio.pontos);
+
+            const userId = auth().currentUser?.uid;
+            await adicionarPontos(userId, resultadoApoio.pontos);
+
+            Toast.show({
+              type: 'success',
+              text1: 'Parabéns!',
+              text2: `Você desbloqueou a conquista: "Apoio à Saúde"!`,
+            });
+          }
+        }
+
+        // Resetando o estado de alterações pendentes
         setHasUnsavedChanges(false);
         setPendingUpdates({}); // Limpa as alterações pendentes após salvar
 
@@ -132,8 +266,8 @@ const GravidaAcompanhamentoScreen = () => {
           text2: 'Falha ao salvar alterações.',
         });
       }
-  }
-};
+    }
+  };
 
   // Função para carregar dados do Firestore ao montar a tela
   useEffect(() => {
@@ -170,6 +304,7 @@ const GravidaAcompanhamentoScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={confirmExit}>
           <Image source={require('../assets/back-icon.png')} style={styles.backIcon} />
@@ -312,7 +447,6 @@ const GravidaAcompanhamentoScreen = () => {
             <TextInput
               style={styles.inputFieldWithIcon}
               keyboardType="numeric"
-              placeholder="__/__/____"
               maxLength={10}
               onChangeText={(text) => handleFieldChange(text, setDataPrimeiraConsulta, 'dataPrimeiraConsulta', true)}
               value={dataPrimeiraConsulta}

@@ -250,29 +250,6 @@ const CadastroPacienteScreen = () => {
             keyboardType="numeric"
           />
         </View>
-
-        {/* Campo Endereço para Depuração */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Endereço (para depuração)</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco}
-            onChangeText={setEndereco}
-            placeholder="Digite o endereço"
-          />
-        </View>
-
-        {/* Campo Telefone para Depuração */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Telefone (para depuração)</Text>
-          <TextInput
-            style={styles.input}
-            value={telefone}
-            onChangeText={setTelefone}
-            placeholder="Digite o telefone"
-            keyboardType="phone-pad"
-          />
-        </View>
         
         <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={cadastrarPaciente}>
@@ -381,6 +358,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: 'center',
     marginBottom: 40,
+    marginTop: 20,
   },
   buttonText: {
     fontSize: 18,

@@ -1,15 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Para navegação
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const PacientesScreen = () => {
   const navigation = useNavigation(); // Navegação para voltar
-  const [isFocused, setIsFocused] = useState(false); // Novo estado para controlar o foco
-  const [searchText, setSearchText] = useState(''); // Estado para o texto da busca
+  const [isLoading, setIsLoading] = useState(true); // Estado para controlar o carregamento
+  const [userRole, setUserRole] = useState('');
+
+  // Função para buscar os dados do usuário logado
+  const buscarDadosUsuario = async () => {
+    try {
+      const userId = auth().currentUser.uid; // Pega o UID do usuário logado
+      const userDoc = await firestore().collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        const { role } = userDoc.data();
+        setUserRole(role);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+    } finally {
+      setIsLoading(false); // Finaliza o carregamento
+    }
+  };
+
+  // Busca os dados do usuário ao montar o componente
+  useEffect(() => {
+    const carregarDados = async () => {
+      setIsLoading(true);
+      await buscarDadosUsuario();
+      setIsLoading(false);
+    };
+    carregarDados();
+  }, []);
+
+  // Exibe um indicador de carregamento enquanto os dados são carregados
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000AF" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-         
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Image source={require('../assets/back-icon.png')} style={styles.backIcon} />
@@ -17,48 +54,26 @@ const PacientesScreen = () => {
         <Text style={styles.title}>Pacientes</Text>
       </View>
 
-      {/* Campo de busca */}
-      {/* 
-      <View style={styles.searchContainer}>
-        <Image source={require('../assets/icon-search.png')} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar Paciente"
-          placeholderTextColor="#fff"
-          value={searchText}
-          onChangeText={setSearchText}
-          onFocus={() => setIsFocused(true)}  // Define como focado
-          onBlur={() => setIsFocused(false)}  // Define como não focado
-        />
-      </View>
-      */}
+      <Text style={styles.subtitle}>
+        Clique para ver as listas de pacientes{"\n"}ou cadastre um novo paciente
+      </Text>
 
-      <Text style={styles.subtitle}>Clique para ver as listas de pacientes{"\n"}ou cadastre um novo paciente</Text>
-
-      {/* Ícones de Pacientes */}
       <View style={styles.optionsContainer}>
         <View style={styles.row}>
-          {/* Ícone de Grávidas */}
-          <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('gravidasList')} >
+          <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('gravidasList')}>
             <Image source={require('../assets/pregnant.png')} style={styles.icon} />
             <Text style={styles.label}>Grávidas</Text>
           </TouchableOpacity>
-
-          {/* Ícone de Crianças */}
           <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('criancasList')}>
             <Image source={require('../assets/kids.png')} style={styles.icon} />
             <Text style={styles.label}>Crianças</Text>
           </TouchableOpacity>
         </View>
-
         <View style={styles.row}>
-          {/* Ícone de Hiperdia */}
           <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('hiperdiaList')}>
             <Image source={require('../assets/hiperdia.png')} style={styles.icon} />
             <Text style={styles.label}>Hiperdia</Text>
           </TouchableOpacity>
-
-          {/* Ícone de Mulheres */}
           <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('mulheresList')}>
             <Image source={require('../assets/women.png')} style={styles.icon} />
             <Text style={styles.label}>Mulheres</Text>
@@ -67,19 +82,20 @@ const PacientesScreen = () => {
       </View>
 
       <View style={styles.containerButton}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AllPacientesList')}>
+          <Text style={styles.buttonText}>Todos os Pacientes</Text>
+        </TouchableOpacity>
 
-      {/* Botão de Todos os Pacientes */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AllPacientesList')}>
-        <Text style={styles.buttonText}>Todos os Pacientes</Text>
-      </TouchableOpacity>
-
-      {/* Botão de Cadastrar Paciente */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroPacienteScreen')}>
-        <Text style={styles.buttonText}>Cadastrar Paciente</Text>
-      </TouchableOpacity>
-
-    </View>
-
+        {/* Botão de Cadastrar Paciente */}
+        {userRole !== 'Agente de Saúde' && (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('CadastroPacienteScreen')}
+          >
+            <Text style={styles.buttonText}>Cadastrar Paciente</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -108,6 +124,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Montserrat-Bold',
     color: '#000',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
   searchContainer: {
     flexDirection: 'row',

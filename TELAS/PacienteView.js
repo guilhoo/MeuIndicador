@@ -15,6 +15,17 @@ const formatarIndicador = (indicador) => {
   return indicadores[indicador] || indicador;
 };
 
+// Função para retornar o ícone correspondente ao indicador
+const getIconByIndicator = (indicador) => {
+  const icones = {
+    hiperdia: require('../assets/hiperdia.png'),
+    crianca: require('../assets/kids.png'),
+    gravida: require('../assets/pregnant.png'),
+    mulher: require('../assets/women.png'),
+  };
+  return icones[indicador] || require('../assets/logoAzul.png'); // Ícone padrão caso o indicador não exista
+};
+
 // Header simplificado
 const Header = ({ onBack }) => (
   <View style={styles.header}>
@@ -90,13 +101,13 @@ const PacienteView = () => {
   const handleAcompanhamento = () => {
     switch (paciente.indicador) {
       case 'hiperdia':
-        return 'HiperdiaScreen';
+        return 'AcompanhamentoHiperdia';
       case 'crianca':
-        return 'CriancaScreen';
+        return 'AcompanhamentoCrianca';
       case 'gravida':
         return 'AcompanhamentoGravida';
       case 'mulher':
-        return 'MulherScreen';
+        return 'AcompanhamentoMulheres';
       default:
         console.error('Indicador desconhecido');
         return null;
@@ -128,7 +139,7 @@ const PacienteView = () => {
     <View style={styles.container}>
       <Header onBack={() => navigation.goBack()} />
       <View style={styles.patientInfoContainer}>
-        <Image source={require('../assets/pregnant.png')} style={styles.pacienteIcon} />
+        <Image source={getIconByIndicator(paciente.indicador)} style={styles.pacienteIcon} />
         <Text style={styles.pacienteNome}>{paciente.nome}</Text>
         <Text style={styles.pacienteIndicador}>
           <Text style={styles.label}>Indicador: </Text>

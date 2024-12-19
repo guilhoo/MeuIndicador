@@ -107,7 +107,7 @@ const CriancaListScreen = () => {
           data={filteredPacientes}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('PacienteView', { paciente: item })}>
               <View style={styles.pacienteItem}>
                 <Text style={styles.pacienteText}>{item.nome}</Text>
                 <Text style={styles.pacienteIndicador}>Indicador: {formatarIndicador(item.indicador)}</Text>

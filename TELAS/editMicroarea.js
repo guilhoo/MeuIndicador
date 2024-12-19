@@ -71,22 +71,26 @@ const EditMicroarea = () => {
       });
       return;
     }
-
+  
     try {
-      // Atualiza a microárea existente
-      await firestore().collection('microareas').doc(microareaId).update({
-        Nome: nomeMicroarea,
-        responsaveis: selectedAgentes,
-      });
-
+      // Atualiza a microárea existente no Firestore
+      await firestore().collection('microareas').doc(microareaId).set(
+        {
+          Nome: nomeMicroarea,
+          responsaveis: selectedAgentes,
+        },
+        { merge: true } // Garante que outros campos não sejam excluídos
+      );
+  
       Toast.show({
         type: 'success',
         text1: 'Sucesso',
         text2: 'Microárea atualizada com sucesso!',
       });
+  
       setTimeout(() => {
         navigation.goBack(); // Volta para a tela anterior após salvar
-      }, 1000); 
+      }, 1000);
     } catch (error) {
       console.error('Erro ao salvar microárea:', error);
       Toast.show({
@@ -96,6 +100,7 @@ const EditMicroarea = () => {
       });
     }
   };
+  
 
   const excluirMicroarea = async () => {
     try {
